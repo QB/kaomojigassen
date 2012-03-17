@@ -9,19 +9,19 @@ $setting = array(
   'screen_name'     => '',
   'curl_ssl_verifypeer' => false,
 );
-//require dirname(__FILE__). '/setting.php';
+require dirname(__FILE__). '/setting.php';
 $twitter = new tmhOAuth($setting);
 
 $wait = 2;
 while ($wait) {
-  echo "Conntecting...\n";
+  say("Conntecting...");
   $twitter->streaming_request('POST', 'https://userstream.twitter.com/2/user.json', array(), 'callback');
   if     ($twitter->response['code'] == 200) $wait =  1;
   elseif ($twitter->response['code'] == 420) $wait *= 4;
   elseif ($twitter->response['code'] ==   0) $wait =  2;
   else $wait *= 2;
   if ($wait > 240) $wait = 240;
-  echo "Disconnected! (Code: {$twitter->response['code']})\nRetry in $wait secs...";
+  say("Disconnected! (Code: {$twitter->response['code']})\nRetry in $wait secs...");
   sleep($wait);
 }
 
@@ -54,14 +54,19 @@ function callback($data, $length, $metrics) {
           'status' => $text,
           'in_reply_to_status_id' => $id,
         ));
-        say("sent: $text");
+        $resp = json_decode($twitter->response['response']);
+        if ($resp->error) {
+          say($text. "の送信中にエラーが発生しました: ". $resp->error);
+        } else {
+          say("ツイートしました: ". $resp->text);
+        }
       }
     }
     say("@${user} ($username): $status\n$id {$client}から");
   }
   
   elseif ($data->{'friends'}) say("Connected!");
-  elseif (!$data) echo "Keeping connected\n";
+  elseif (!$data) say("Keeping connected");
   
 }
 function say($data) {
