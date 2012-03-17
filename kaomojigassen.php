@@ -9,7 +9,7 @@ $setting = array(
   'screen_name'     => '',
   'curl_ssl_verifypeer' => false,
 );
-require dirname(__FILE__). '/setting.php';
+//require dirname(__FILE__). '/setting.php';
 $twitter = new tmhOAuth($setting);
 
 $wait = 2;
