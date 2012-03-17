@@ -45,8 +45,8 @@ function callback($data, $length, $metrics) {
     $replyto  = $data->{'in_reply_to_screen_name'};
     $client   = preg_replace("/<[^>]+>/", '', $data->{'source'});
     if ($replyto == $twitter->config['screen_name']) {
-      if (preg_match("/@{$replyto}\s*(\([^)]+\))/", $status, $matches)) {
-        $count = substr_count($status, '(') + substr_count($status, '（') +1;
+      if (preg_match("/^@{$replyto}\s*(\([^)@]+\))/", $status, $matches)) {
+        $count = substr_count($status, '(') + 1;
         $text = "@${user} ";
         $kaomoji = $matches[1];
         for ($i = 0; $i < $count; $i++) $text .= $kaomoji;
@@ -54,11 +54,11 @@ function callback($data, $length, $metrics) {
           'status' => $text,
           'in_reply_to_status_id' => $id,
         ));
-        $resp = json_decode($twitter->response['response']);
-        if ($resp->error) {
-          say($text. "の送信中にエラーが発生しました: ". $resp->error);
+        $resp = $twitter->response;
+        if ($resp['code'] == 200) {
+          say("ツイートしました");
         } else {
-          say("ツイートしました: ". $resp->text);
+          say($text. " の送信中にエラーが発生しました");
         }
       }
     }
@@ -71,6 +71,7 @@ function callback($data, $length, $metrics) {
 }
 function say($data) {
   $sep  = "\n----\n";
+  // echo $data. $sep; // UTF-8 環境の場合
   echo mb_convert_encoding($data. $sep, 'SJIS', 'UTF8');
 }
 
