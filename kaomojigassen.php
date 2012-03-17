@@ -45,7 +45,7 @@ function callback($data, $length, $metrics) {
     $replyto  = $data->{'in_reply_to_screen_name'};
     $client   = preg_replace("/<[^>]+>/", '', $data->{'source'});
     if ($replyto == $twitter->config['screen_name']) {
-      if (preg_match("/@{$replyto}\s*(\([^)]+\)\)/", $status, $matches)) {
+      if (preg_match("/@{$replyto}\s*(\([^)]+\))/", $status, $matches)) {
         $count = substr_count($status, '(') + substr_count($status, '（') +1;
         $text = "@${user} ";
         $kaomoji = $matches[1];
